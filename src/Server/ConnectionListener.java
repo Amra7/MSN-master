@@ -9,22 +9,24 @@ public class ConnectionListener extends Thread {
 
 	private InputStream is;
 	private String sender;
-	
-	public ConnectionListener(InputStream is, String sender){
+
+	public ConnectionListener(InputStream is, String sender) {
 		this.is = is;
-		this.sender= sender;
-		
+		this.sender = sender;
+
 	}
-	
+
 	@Override
 	public void run() {
-		BufferedReader br =  new BufferedReader( new InputStreamReader(is));
-		
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+
 		try {
 			String line = "";
-			while ( (line= br.readLine()) != null){
-				if ( !line.equals("")){
-					new Message(line, sender);
+			while ((line = br.readLine()) != null) {
+				if (!line.equals("")) {
+					Message incoming = new Message(line, sender);
+					System.out.println(incoming.getSender() + ": " + incoming.getContent());
+					System.out.println("Listener: " + Message.hasNext());
 				}
 			}
 		} catch (IOException e) {

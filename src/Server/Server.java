@@ -3,24 +3,22 @@ package Server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Random;
 
-import GUI.ChatGui;
+import java.util.Random;
 
 public class Server {
 
 	public static final int port = 1717;
-	public static HashMap<String, OutputStream> connections ;
 
 	public static void serverStart() throws IOException {
 		ServerSocket server = new ServerSocket(port);
-		connections = new HashMap<String, OutputStream>();
-		
+		ConnectionWriter cw = new ConnectionWriter();
+		cw.start();
+
 		while (true) {
 			String str = "waiting for connection";
 			System.out.println(str);
@@ -28,16 +26,17 @@ public class Server {
 			try {
 				client = server.accept();
 				String clientName = handShake(client.getInputStream());
-				
-				if (clientName != null){
-					while ( connections.containsKey(clientName)){
+
+				if (clientName != null) {
+					while (ConnectionWriter.connections.containsKey(clientName)) {
 						clientName += new Random().nextInt(1000);
-					}					
-					connections.put(clientName, client.getOutputStream());
-					
-			
-					ChatGui gui = new ChatGui(client);
-					new Thread(gui).start();
+					}
+					ConnectionWriter.connections.put(clientName,
+							client.getOutputStream());
+					ConnectionListener cl = new ConnectionListener(
+							client.getInputStream(), clientName);
+					cl.start();
+
 				}
 
 			} catch (IOException e) {

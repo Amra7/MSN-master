@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
+
 import java.net.Socket;
 
 import javax.swing.JButton;
@@ -71,7 +71,7 @@ public class ChatGui implements Runnable {
 		String line = null;
 		while ((line = input.readLine()) != null) {
 			if (!line.equals("")) {
-				display.append("Client: " + line + "\n");
+				display.append(line + "\n");
 				line = null;
 			}
 		}
