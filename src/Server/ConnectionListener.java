@@ -25,10 +25,12 @@ public class ConnectionListener extends Thread {
 			while ((line = br.readLine()) != null) {
 				if (!line.equals("")) {
 					Message incoming = new Message(line, sender);
-					System.out.println(incoming.getSender() + ": " + incoming.getContent());
+					System.out.println(incoming.getSender() + ":" + incoming.getContent());
 					System.out.println("Listener: " + Message.hasNext());
 				}
 			}
+			ConnectionWriter.connections.remove(this.sender);
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

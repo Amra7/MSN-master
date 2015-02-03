@@ -6,12 +6,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-
 import java.net.Socket;
 
 import javax.swing.JButton;
@@ -28,7 +30,7 @@ public class ChatGui implements Runnable {
 	private InputStream is;
 	private OutputStream os;
 
-	public ChatGui(Socket connection) throws IOException {
+	public ChatGui(final Socket connection) throws IOException {
 
 		this.connection = connection;
 		this.is = connection.getInputStream();
@@ -59,24 +61,61 @@ public class ChatGui implements Runnable {
 		window.add(content);
 
 		window.setResizable(false);
-		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		window.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e){
+				try {
+					connection.shutdownOutput();
+					connection.close();
+					
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				System.exit(0);
+			}
+		
+		});
 		window.setSize(400, 300);
 		window.setVisible(true);
 
 	}
 
+	/**
+	 * Listening messages.
+	 * @throws IOException
+	 */
 	public void listenForNetwork() throws IOException {
 		BufferedReader input = new BufferedReader(new InputStreamReader(is));
 
 		String line = null;
 		while ((line = input.readLine()) != null) {
+			
 			if (!line.equals("")) {
-				display.append(line + "\n");
+				String [] arrString = line.split(":");
+				
+				if( arrString[0].equals("%server%")){
+					String [] secPartArrString = arrString[1].split("%");
+					
+					if (secPartArrString[0].equals(" join")){
+						display.append(secPartArrString[1] + " joined the chat!\n");
+						
+					} else if(secPartArrString[0].equals(" left")){
+						display.append(secPartArrString[1] + " had left the chat!\n");
+					}
+				} else{
+					display.append(line + "\n");					
+				}
 				line = null;
 			}
 		}
 	}
 
+	/**
+	 * Sending message.
+	 * @author amrapoprzanovic
+	 *
+	 */
 	private class MessageHandler extends KeyAdapter implements ActionListener {
 
 		private void sendMessage() {

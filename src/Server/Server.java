@@ -36,11 +36,11 @@ public class Server {
 					ConnectionListener cl = new ConnectionListener(
 							client.getInputStream(), clientName);
 					cl.start();
+					new Message("join%"+ clientName, "%server%");
 
 				}
 
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -51,6 +51,7 @@ public class Server {
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
 		String name = br.readLine();
+		name = name.replace("%", ""); // sanela je ostavla ""
 		return name;
 
 	}
