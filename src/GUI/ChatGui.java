@@ -1,5 +1,6 @@
 package GUI;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
@@ -25,6 +26,7 @@ import javax.swing.JTextArea;
 public class ChatGui implements Runnable {
 
 	private JTextArea display;
+	private JTextArea displayVisitors;
 	private TextField inputMsg;
 	private Socket connection;
 	private InputStream is;
@@ -39,9 +41,19 @@ public class ChatGui implements Runnable {
 		JFrame window = new JFrame("MSN");
 		JPanel content = new JPanel();
 		JButton buttonSend = new JButton("SEND");
+		// display za text
 		display = new JTextArea();
 		// display.setPreferredSize(new Dimension(300, 200));
 		display.setEditable(false);
+		
+		// diplay za posjetioce chata
+		JTextArea displayVisitors =  new JTextArea();
+		JScrollPane areaScrollPaneVisitors = new JScrollPane(displayVisitors);
+		areaScrollPaneVisitors
+				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		areaScrollPaneVisitors.setPreferredSize(new Dimension(100, 220));
+		
+		// Prozor za unosenje poruke
 		inputMsg = new TextField();
 		inputMsg.setPreferredSize(new Dimension(200, 20));
 
@@ -49,12 +61,14 @@ public class ChatGui implements Runnable {
 		inputMsg.addKeyListener(new MessageHandler());
 		display.setLineWrap(true);
 
+		//Text chata
 		JScrollPane areaScrollPane = new JScrollPane(display);
 		areaScrollPane
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		areaScrollPane.setPreferredSize(new Dimension(390, 220));
 
 		content.add(areaScrollPane);
+		content.add(areaScrollPaneVisitors);
 		content.add(inputMsg);
 		content.add(buttonSend);
 
@@ -76,7 +90,7 @@ public class ChatGui implements Runnable {
 			}
 		
 		});
-		window.setSize(400, 300);
+		window.setSize(500, 300);
 		window.setVisible(true);
 
 	}
@@ -99,9 +113,11 @@ public class ChatGui implements Runnable {
 					
 					if (secPartArrString[0].equals(" join")){
 						display.append(secPartArrString[1] + " joined the chat!\n");
+						displayVisitors.append(secPartArrString[1]+"\n");
 						
 					} else if(secPartArrString[0].equals(" left")){
 						display.append(secPartArrString[1] + " had left the chat!\n");
+						//displayVisitors.remove((secPartArrString[1].);
 					}
 				} else{
 					display.append(line + "\n");					
